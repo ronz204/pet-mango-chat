@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    // Environment - Latest JavaScript features
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "ESNext",
+
+    // Bundler mode - Modern module resolution for Bun
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+
+    // Type checking - Strict mode enabled
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Best practices - Additional safety checks
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+
+    // Bun runtime types
+    "types": ["@types/bun"],
+
+    // Path aliases
+    "paths": {
+      "@seeders/*": ["./prisma/seeds/*"],
+      "@prisma/*": ["./generated/prisma/*"],
+
+      "@dal/*": ["./source/dal/*"],
+      "@auth/*": ["./source/auth/*"],
+      "@repos/*": ["./source/repos/*"],
+      "@shared/*": ["./source/shared/*"],
+      "@plugins/*": ["./source/plugins/*"],
+      "@features/*": ["./source/features/*"],
+      "@database/*": ["./source/database/*"],
+      "@contracts/*": ["./source/contracts/*"],
+    }
+  }
+}

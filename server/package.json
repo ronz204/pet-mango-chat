@@ -1,0 +1,14 @@
+{
+  "name": "server",
+  "version": "1.0.50",
+  "scripts": {
+    "dev": "bun run --watch src/boot.ts"
+  },
+  "dependencies": {
+    "elysia": "latest"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "module": "src/boot.ts"
+}
