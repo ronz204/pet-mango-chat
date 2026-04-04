@@ -1,0 +1,44 @@
+name: mango-api
+
+services:
+  redis:
+    image: redis:alpine3.23
+    restart: unless-stopped
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - mango-network
+    volumes:
+      - redis-data:/data
+
+  postgres:
+    env_file: .env.local
+    image: postgres:16-alpine
+    restart: unless-stopped
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - mango-network
+    volumes:
+      - mango-data:/var/lib/postgresql/data
+    healthcheck: # Use pg_isready to check if the database is ready
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mango-data:
+    driver: local
+    name: mango-data
+  redis-data:
+    driver: local
+    name: redis-data
+
+networks:
+  mango-network:
+    driver: bridge
+    name: mango-network
