@@ -2,7 +2,9 @@
   "name": "server",
   "version": "1.0.50",
   "scripts": {
-    "dev": "bun run --watch source/boot.ts"
+    "dev": "bun run --watch source/boot.ts",
+    "prisma:generate": "bunx --bun prisma generate",
+    "prisma:migrate": "bunx --bun prisma migrate dev"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.6.0",
