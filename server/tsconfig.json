@@ -29,14 +29,13 @@
       "@seeders/*": ["./prisma/seeds/*"],
       "@prisma/*": ["./generated/prisma/*"],
 
-      "@dal/*": ["./source/dal/*"],
-      "@auth/*": ["./source/auth/*"],
-      "@repos/*": ["./source/repos/*"],
+      "@dal/*": ["./source/core/dal/*"],
+      "@auth/*": ["./source/core/auth/*"],
+      
       "@shared/*": ["./source/shared/*"],
       "@plugins/*": ["./source/plugins/*"],
       "@features/*": ["./source/features/*"],
       "@database/*": ["./source/database/*"],
-      "@contracts/*": ["./source/contracts/*"],
     }
   }
 }
