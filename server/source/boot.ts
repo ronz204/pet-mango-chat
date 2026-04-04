@@ -1,7 +1,9 @@
 import { Elysia } from "elysia";
 import { HealthPlugin } from "@plugins/health.plugin";
+import { ScalarPlugin } from "@plugins/scalar.plugin";
 
 const app = new Elysia({ prefix: "/api" })
+  .use(ScalarPlugin)
   .use(HealthPlugin)
   .listen(process.env.PORT!);
 
