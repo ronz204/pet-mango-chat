@@ -8,4 +8,5 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  schemas = ["mango"]
 }
