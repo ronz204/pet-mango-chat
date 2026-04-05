@@ -1,6 +1,7 @@
 import type { IRoomDao } from "./room.idao";
 import { PrismaClient } from "@prisma/client";
 
+import { Own } from "./queries/own.query";
 import { Leave } from "./queries/leave.query";
 import { Create } from "./queries/create.query";
 import { Obtain } from "./queries/obtain.query";
@@ -8,6 +9,10 @@ import { Invitees } from "./queries/invitees.query";
 
 export class RoomDao implements IRoomDao {
   constructor(private prisma: PrismaClient) {};
+
+  public async own(args: Own.Args) {
+    return await this.prisma.room.findMany(Own.query(args));
+  };
 
   public async leave(args: Leave.Args) {
     return await this.prisma.member.delete(Leave.query(args));
