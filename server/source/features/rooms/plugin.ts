@@ -3,6 +3,10 @@ import { RoomDao } from "@dal/rooms/room.dao";
 import { AuthPlugin } from "@auth/auth.plugin";
 import { PrismaPlugin } from "@plugins/prisma.plugin";
 
+import { LeaveParams } from "./leave/leave.schema";
+import { LeaveHandler } from "./leave/leave.handler";
+import { LeaveResponse } from "./leave/leave.schema";
+
 import { CreateBody } from "./create/create.schema";
 import { CreateHandler } from "./create/create.handler";
 import { CreateResponse } from "./create/create.schema";
@@ -22,6 +26,7 @@ export const RoomsPlugin = new Elysia({ name, prefix })
     const dao = new RoomDao(prisma);
 
     return {
+      leaveH: new LeaveHandler(dao),
       createH: new CreateHandler(dao),
       inviteesH: new InviteesHandler(dao),
     };
@@ -35,6 +40,17 @@ export const RoomsPlugin = new Elysia({ name, prefix })
     body: CreateBody,
     response: {
       200: CreateResponse,
+    },
+  })
+
+  .delete("/:roomId/leave", async ({ status, params, userId, leaveH }) => {
+    const response = await leaveH.handle({ params, userId });
+    return status(200, response);
+  }, {
+    isAuth: true,
+    params: LeaveParams,
+    response: {
+      200: LeaveResponse,
     },
   })
   
