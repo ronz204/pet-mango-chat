@@ -1,0 +1,25 @@
+model Invitation {
+  id Int @id @default(autoincrement())
+
+  status InvitationStatus @default(PENDING)
+
+  inviteeId Int // Foreign key to the User who received the invitation
+  invitee   User @relation(fields: [inviteeId], references: [id])
+
+  roomId Int // Foreign key to the Room being invited to
+  room   Room @relation(fields: [roomId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("invitations")
+  @@schema("mango")
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+
+  @@schema("mango")
+}

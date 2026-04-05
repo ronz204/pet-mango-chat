@@ -2,8 +2,9 @@ model Room {
   id   Int    @id @default(autoincrement())
   name String @unique
 
-  members  Member[]
-  messages Message[]
+  members     Member[]
+  messages    Message[]
+  invitations Invitation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
