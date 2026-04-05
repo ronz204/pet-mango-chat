@@ -2,6 +2,7 @@ import type { IRoomDao } from "./room.idao";
 import { PrismaClient } from "@prisma/client";
 import { Create } from "./queries/create.query";
 import { Obtain } from "./queries/obtain.query";
+import { Invitees } from "./queries/invitees.query";
 
 export class RoomDao implements IRoomDao {
   constructor(private prisma: PrismaClient) {};
@@ -12,5 +13,9 @@ export class RoomDao implements IRoomDao {
 
   public async obtain(args: Obtain.Args) {
     return await this.prisma.room.findFirst(Obtain.query(args));
+  };
+
+  public async invitees(args: Invitees.Args) {
+    return await this.prisma.user.findMany(Invitees.query(args));
   };
 };
