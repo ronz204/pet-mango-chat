@@ -7,6 +7,10 @@ import { CreateBody } from "./create/create.schema";
 import { CreateHandler } from "./create/create.handler";
 import { CreateResponse } from "./create/create.schema";
 
+import { InviteesParams } from "./invitees/invitees.schema";
+import { InviteesHandler } from "./invitees/invitees.handler";
+import { InviteesResponse } from "./invitees/invitees.schema";
+
 const prefix: string = "/rooms";
 const name: string = "rooms.plugin";
 
@@ -19,6 +23,7 @@ export const RoomsPlugin = new Elysia({ name, prefix })
 
     return {
       createH: new CreateHandler(dao),
+      inviteesH: new InviteesHandler(dao),
     };
   })
 
@@ -30,5 +35,16 @@ export const RoomsPlugin = new Elysia({ name, prefix })
     body: CreateBody,
     response: {
       200: CreateResponse,
+    },
+  })
+  
+  .get("/:roomId/invitees", async ({ status, params, inviteesH }) => {
+    const response = await inviteesH.handle({ params });
+    return status(200, response);
+  }, {
+    isAuth: true,
+    params: InviteesParams,
+    response: {
+      200: InviteesResponse,
     },
   });
