@@ -1,11 +1,14 @@
 import type { IUserDao } from "@dal/users/user.idao";
-import type { ObtainRequest } from "./obtain.schema";
-import type { ObtainResponse } from "./obtain.schema";
+import type { GetProfileRequest } from "./get-profile.schema";
+import type { GetProfileResponse } from "./get-profile.schema";
 
-export class ObtainHandler {
+type Request = GetProfileRequest;
+type Response = GetProfileResponse;
+
+export class GetProfileHandler {
   constructor(private dao: IUserDao) {};
 
-  public async handle(req: ObtainRequest): Promise<ObtainResponse> {
+  public async handle(req: Request): Promise<Response> {
     const user = await this.dao.obtain({ id: req.userId });
     if (!user) throw new Error("User not found");
 
