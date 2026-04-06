@@ -1,4 +1,5 @@
 import { Elysia } from "elysia";
+import { RoomsPlugin } from "@features/rooms/plugin";
 import { HealthPlugin } from "@plugins/health.plugin";
 import { ScalarPlugin } from "@plugins/scalar.plugin";
 import { ProfilePlugin } from "@features/profile/plugin";
@@ -9,6 +10,7 @@ const app = new Elysia({ prefix: "/api" })
   .use(HealthPlugin)
   .use(IdentityPlugin)
   .use(ProfilePlugin)
+  .use(RoomsPlugin)
   .listen(process.env.PORT!);
 
 const url = `http://${app.server?.hostname}:${app.server?.port}`;
