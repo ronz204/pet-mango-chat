@@ -1,11 +1,14 @@
 import type { IUserDao } from "@dal/users/user.idao";
-import type { RefreshRequest } from "./refresh.schema";
-import type { RefreshResponse } from "./refresh.schema";
+import type { UpdateInfoRequest } from "./update-info.schema";
+import type { UpdateInfoResponse } from "./update-info.schema";
 
-export class RefreshHandler {
+type Request = UpdateInfoRequest;
+type Response = UpdateInfoResponse;
+
+export class UpdateInfoHandler {
   constructor(private dao: IUserDao) {};
 
-  public async handle(req: RefreshRequest): Promise<RefreshResponse> {
+  public async handle(req: Request): Promise<Response> {
     const exists = await this.dao.obtain({ id: req.userId });
     if (!exists) throw new Error("User not found");
 
