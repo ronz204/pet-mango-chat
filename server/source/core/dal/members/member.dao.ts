@@ -1,8 +1,9 @@
 import type { IMemberDao } from "./member.idao";
 import { PrismaClient } from "@prisma/client";
 
-import { Exists } from "./queries/exists.query";
+import { Obtain } from "./queries/obtain.query";
 import { Delete } from "./queries/delete.query";
+import { Create } from "./queries/create.query";
 
 export class MemberDao implements IMemberDao {
   constructor(private prisma: PrismaClient) {};
@@ -11,7 +12,11 @@ export class MemberDao implements IMemberDao {
     return await this.prisma.member.delete(Delete.query(args));
   };
 
-  public async exists(args: Exists.Args) {
-    return await this.prisma.room.findFirst(Exists.query(args));
+  public async create(args: Create.Args) {
+    return await this.prisma.member.create(Create.query(args));
+  };
+
+  public async obtain(args: Obtain.Args) {
+    return await this.prisma.member.findFirst(Obtain.query(args));
   };
 };
