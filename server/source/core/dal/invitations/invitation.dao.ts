@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { Create } from "./queries/create.query";
 import { Update } from "./queries/update.query";
 import { Obtain } from "./queries/obtain.query";
+import { Search } from "./queries/search.query";
 import { Invitees } from "./queries/invitees.query";
 
 export class InvitationDao implements IInvitationDao {
@@ -23,5 +24,9 @@ export class InvitationDao implements IInvitationDao {
 
   public async obtain(args: Obtain.Args) {
     return await this.prisma.invitation.findFirst(Obtain.query(args));
+  };
+
+  public async search(args: Search.Args) {
+    return await this.prisma.invitation.findMany(Search.query(args));
   };
 };
