@@ -1,3 +1,5 @@
+import { InvitationStatus } from "@prisma/enums";
+
 import type { IInvitationDao } from "@dal/invitations/invitation.idao";
 import type { SendInvitationRequest } from "./send-invitation.schema";
 import type { SendInvitationResponse } from "./send-invitation.schema";
@@ -9,7 +11,10 @@ export class SendInvitationHandler {
   constructor(private dao: IInvitationDao) {};
 
   public async handle(req: Request): Promise<Response> {
-    const exists = await this.dao.exists(req.body);
+    const exists = await this.dao.obtain({
+      ...req.body, status: InvitationStatus.PENDING,
+    });
+
     if (exists) throw new Error("Invitation already exists");
     
     const invitation = await this.dao.create(req.body);

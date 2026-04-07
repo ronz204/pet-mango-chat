@@ -15,9 +15,7 @@ export const SendInvitationPlugin = new Elysia({ name })
 
   .derive(({ prisma }) => {
     const dao = new InvitationDao(prisma);
-    const handler = new SendInvitationHandler(dao);
-
-    return { handler };
+    return { handler: new SendInvitationHandler(dao) };
   })
 
   .post("/", async ({ status, body, handler }) => {
