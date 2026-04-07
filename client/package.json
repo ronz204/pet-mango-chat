@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
+    "@tanstack/vue-query": "^5.96.2",
     "tailwindcss": "^4.2.2",
     "vue": "^3.5.32",
     "vue-router": "4"
