@@ -17,7 +17,6 @@ export const AcceptInvitationPlugin = new Elysia({ name })
   .derive(({ prisma }) => {
     const inviteDao = new InvitationDao(prisma);
     const memberDao = new MemberDao(prisma);
-
     return { handler: new AcceptInvitationHandler(memberDao, inviteDao) };
   })
 
