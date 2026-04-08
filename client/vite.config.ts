@@ -6,7 +6,17 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
   resolve: { alias: {
+    "@guards": "/src/shared/guards",
+    "@stores": "/src/shared/stores",
+    "@helpers": "/src/shared/helpers",
+
     "@features": "/src/features",
-    "@components": "/src/components",
+    "@services": "/src/services",
+    "@schemas": "/src/schemas",
+
+    "@atoms": "/src/components/atoms",
+    "@layouts": "/src/components/layouts",
+    "@molecules": "/src/components/molecules",
+    "@organisms": "/src/components/organisms",
   }},
 });
