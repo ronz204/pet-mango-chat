@@ -16,9 +16,9 @@
       "@stores/*": ["./src/shared/stores/*"],
       "@helpers/*": ["./src/shared/helpers/*"],
 
-      "@features/*": ["./src/features/*"],
-      "@services/*": ["./src/services/*"],
       "@schemas/*": ["./src/schemas/*"],
+      "@features/*": ["./src/features/*"],
+      "@providers/*": ["./src/providers/*"],
 
       "@atoms/*": ["./src/components/atoms/*"],
       "@layouts/*": ["./src/components/layouts/*"],
