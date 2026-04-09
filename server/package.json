@@ -7,6 +7,7 @@
     "prisma:migrate": "bunx --bun prisma migrate dev"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.1",
     "@elysiajs/jwt": "^1.4.1",
     "@elysiajs/openapi": "^1.4.14",
     "@prisma/adapter-pg": "^7.6.0",
