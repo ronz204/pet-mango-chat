@@ -6,6 +6,8 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
   resolve: { alias: {
+    "@api": "/src/api",
+
     "@guards": "/src/shared/guards",
     "@stores": "/src/shared/stores",
     "@helpers": "/src/shared/helpers",
