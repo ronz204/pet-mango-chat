@@ -1,7 +1,8 @@
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-export interface HttpRequest extends RequestInit{
+export interface HttpRequest extends Omit<RequestInit, "body" | "method"> {
   params?: Record<string, string | number>;
+  body?: Record<string, unknown> | object;
 };
 
 export interface HttpResponse<T> {

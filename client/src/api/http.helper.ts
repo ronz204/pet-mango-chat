@@ -8,7 +8,7 @@ export class HttpHelper {
   };
 
   public buildURL(baseURL: string): string {
-    const url = new URL(this.action.endpoint, baseURL);
+    const url = new URL(`${baseURL}${this.action.endpoint}`);
     this.addParams(url);
     return url.toString();
   };
@@ -27,6 +27,11 @@ export class HttpHelper {
 
   public buildInit(headers: HeadersInit): RequestInit {
     const { params: _params, ...rest } = this.action.config;
-    return { ...rest, headers: this.buildHeaders(headers) };
+
+    return {
+      ...(rest as RequestInit),
+      method: this.action.method,
+      headers: this.buildHeaders(headers)
+    };
   };
 };
