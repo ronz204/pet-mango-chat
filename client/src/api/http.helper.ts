@@ -1,32 +1,32 @@
-import type { HttpRequest, HttpParams, HttpHeaders, HttpMethod } from "./http.models";
+import type { HttpAction } from "./http.models";
 
 export class HttpHelper {
-  private readonly config: HttpRequest;
+  private readonly action: HttpAction;
 
-  constructor(config: HttpRequest) {
-    this.config = config;
+  constructor(action: HttpAction) {
+    this.action = action;
   };
 
-  public buildURL(baseUrl: string, endpoint: string): string {
-    const url = new URL(`${baseUrl}${endpoint}`);
-    this.addParams(url, this.config.params);
+  public buildURL(baseURL: string): string {
+    const url = new URL(this.action.endpoint, baseURL);
+    this.addParams(url);
     return url.toString();
   };
 
-  private addParams(url: URL, params?: HttpParams): void {
-    if (!params) return;
+  public addParams(url: URL): void {
+    if (!this.action.config.params) return;
 
-    for (const [key, value] of Object.entries(params)) {
+    Object.entries(this.action.config.params).forEach(([key, value]) => {
       url.searchParams.append(key, String(value));
-    };
+    });
   };
 
-  private buildHeaders(headers: HttpHeaders): HttpHeaders {
-    return { ...headers, ...this.config.headers };
+  public buildHeaders(headers: HeadersInit): HeadersInit {
+    return { ...headers, ...this.action.config.headers };
   };
 
-  public buildRequest(method: HttpMethod, headers: HttpHeaders): RequestInit {
-    const { params: _params, headers: _headers, ...rest } = this.config;
-    return { method, headers: this.buildHeaders(headers), ...rest };
+  public buildInit(headers: HeadersInit): RequestInit {
+    const { params: _params, ...rest } = this.action.config;
+    return { ...rest, headers: this.buildHeaders(headers) };
   };
 };
