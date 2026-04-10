@@ -13,3 +13,14 @@ export const AuthInterceptor: HttpInterceptor = {
     };
   },
 };
+
+export const BodyInterceptor: HttpInterceptor = {
+  onRequest: (request) => {
+    if (!request.body) return request;
+
+    return {
+      ...request,
+      body: JSON.stringify(request.body),
+    };
+  },
+};

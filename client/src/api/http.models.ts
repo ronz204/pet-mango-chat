@@ -1,24 +1,31 @@
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-export type HttpParams = Record<string, string | number>;
-export type HttpHeaders = Record<string, string>;
 
-export interface HttpRequest extends RequestInit {
-  params?: HttpParams;
-  headers?: HttpHeaders;
+export interface HttpRequest extends RequestInit{
+  params?: Record<string, string | number>;
 };
 
-export interface HttpResponse<Data> {
-  data: Data;
+export interface HttpResponse<T> {
+  data: T;
   status: number;
+  headers: Headers;
 };
+
+export interface HttpAction {
+  endpoint: string;
+  method: HttpMethod;
+  config: HttpRequest;
+};
+
+type RequestReturn = RequestInit | Promise<RequestInit>;
+type ResponseReturn<T> = HttpResponse<T> | Promise<HttpResponse<T>>;
 
 export interface HttpInterceptor {
-  onRequest?: (request: RequestInit) => RequestInit | Promise<RequestInit>;
-  onResponse?: <T>(response: HttpResponse<T>) => HttpResponse<T> | Promise<HttpResponse<T>>;
+  onRequest?: (request: RequestInit) => RequestReturn;
+  onResponse?: <T>(response: HttpResponse<T>) => ResponseReturn<T>;
 };
 
-export interface HttpClientOptions {
+export interface HttpClientConfig {
   url: string;
-  headers: HttpHeaders;
+  headers: HeadersInit;
   interceptors: HttpInterceptor[];
 };
