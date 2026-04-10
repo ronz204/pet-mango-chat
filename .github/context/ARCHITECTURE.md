@@ -1,4 +1,4 @@
-# 🏗️ Mango — Architecture
+# 🥭 Mango — Architecture
 
 ## 📌 Application Type
 
