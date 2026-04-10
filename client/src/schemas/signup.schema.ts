@@ -14,3 +14,5 @@ export const SignUpSchema = z.object({
     .min(8, "Password must be at least 8 characters")
     .max(64, "Password is too long"),
 });
+
+export type SignUpRequest = z.infer<typeof SignUpSchema>;

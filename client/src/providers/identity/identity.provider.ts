@@ -1,16 +1,14 @@
-import { BaseProvider } from "@providers/base.provider";
+import { api } from "@api/http.facade";
+import type { AuthResponse } from "./identity.types";
+import type { SignInRequest } from "@schemas/signin.schema";
+import type { SignUpRequest } from "@schemas/signup.schema";
 
-import type {
-  SignInRequest,
-  SignUpRequest,
-} from "./identity.types";
-
-export class IdentityProvider extends BaseProvider {
-  public async signIn(req: SignInRequest) {
-    console.log(req);
+export class IdentityProvider {
+  public static async signIn(data: SignInRequest): Promise<AuthResponse> {
+    return api.post<AuthResponse>("/auth/signin", { body: data });
   };
 
-  public async signUp(req: SignUpRequest) {
-    console.log(req);
+  public static async signUp(data: SignUpRequest): Promise<AuthResponse> {
+    return api.post<AuthResponse>("/auth/signup", { body: data });
   };
 };
