@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@lucide/vue": "^1.7.0",
-    "@tailwindcss/vite": "^4.2.2",
+    "@nuxt/ui": "^4.6.1",
     "@tanstack/vue-query": "^5.96.2",
     "@vee-validate/zod": "^4.15.1",
     "pinia": "^3.0.4",
