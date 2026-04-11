@@ -419,61 +419,57 @@ const sendMessage = async (roomId: string, content: string) => {
 
 ```
 backend/
-├─ src/
+├─ source/
 │  ├─ features/                    # 🎯 Vertical Slices
-│  │  ├─ auth/
-│  │  │  ├─ auth.controller.ts     # Routes
-│  │  │  ├─ auth.service.ts        # Business logic
-│  │  │  ├─ auth.validator.ts      # Zod schemas
-│  │  │  ├─ auth.types.ts          # Types
-│  │  │  └─ index.ts               # Elysia plugin
+│  │  ├─ identity/
+│  │  │  ├─ plugin.ts              # Routes aggregator
+│  │  │  ├─ signin/
+│  │  │  │  ├─ signin.handler.ts   # Business logic
+│  │  │  │  ├─ signin.schema.ts    # Zod schemas  
+│  │  │  │  └─ signin.plugin.ts    # (optional)
+│  │  │  └─ signup/
+│  │  │     ├─ signup.handler.ts
+│  │  │     └─ signup.schema.ts
 │  │  ├─ rooms/
-│  │  │  ├─ rooms.controller.ts
-│  │  │  ├─ rooms.service.ts
-│  │  │  ├─ rooms.validator.ts
-│  │  │  ├─ rooms.types.ts
-│  │  │  └─ index.ts
-│  │  ├─ messages/
-│  │  │  ├─ messages.controller.ts
-│  │  │  ├─ messages.service.ts
-│  │  │  ├─ messages.validator.ts
-│  │  │  ├─ messages.types.ts
-│  │  │  └─ index.ts
-│  │  └─ invitations/
-│  │     ├─ invitations.controller.ts
-│  │     ├─ invitations.service.ts
-│  │     ├─ invitations.validator.ts
-│  │     ├─ invitations.types.ts
-│  │     └─ index.ts
+│  │  │  ├─ plugin.ts
+│  │  │  ├─ create-room/
+│  │  │  ├─ get-my-rooms/
+│  │  │  └─ leave-room/
+│  │  ├─ invites/
+│  │  │  ├─ plugin.ts
+│  │  │  ├─ send-invitation/
+│  │  │  └─ accept-invitation/
+│  │  └─ profile/
+│  │     ├─ plugin.ts
+│  │     ├─ get-profile/
+│  │     └─ update-info/
 │  ├─ core/                        # Shared
-│  │  ├─ db/
-│  │  │  ├─ client.ts              # Prisma instance
-│  │  │  └─ migrations/
-│  │  ├─ redis/
-│  │  │  ├─ client.ts              # Redis instance
-│  │  │  └─ pubsub.ts              # Pub/Sub setup
-│  │  ├─ middleware/
-│  │  │  ├─ auth.ts
-│  │  │  └─ errorHandler.ts
-│  │  ├─ utils/
-│  │  │  ├─ jwt.ts
-│  │  │  └─ errors.ts
-│  │  └─ types/
-│  │     └─ common.ts
-│  ├─ websocket/                   # Real-time
-│  │  ├─ handlers/
-│  │  │  ├─ messageHandler.ts
-│  │  │  ├─ typingHandler.ts
-│  │  │  └─ presenceHandler.ts
-│  │  ├─ events.ts                 # Event types
-│  │  └─ socketServer.ts
-│  ├─ app.ts                       # Elysia app setup
-│  └─ index.ts                     # Entry point
+│  │  ├─ dal/                      # Data Access Layer
+│  │  │  ├─ users/
+│  │  │  │  ├─ user.dao.ts         # DAO implementation
+│  │  │  │  ├─ user.idao.ts        # DAO interface
+│  │  │  │  └─ queries/            # Query builders
+│  │  │  ├─ rooms/
+│  │  │  ├─ members/
+│  │  │  └─ invitations/
+│  │  ├─ auth/
+│  │  │  ├─ auth.plugin.ts         # JWT & auth middleware
+│  │  │  └─ auth.schema.ts
+│  ├─ plugins/                     # Infrastructure
+│  │  ├─ prisma.plugin.ts          # Prisma instance
+│  │  ├─ cors.plugin.ts
+│  │  ├─ health.plugin.ts
+│  │  └─ scalar.plugin.ts          # API docs
+│  └─ boot.ts                      # Entry point
 ├─ prisma/
-│  ├─ schema.prisma
-│  └─ migrations/
+│  ├─ schema.prisma                # Main schema (imports models)
+│  └─ models/                      # Separated models
+│     ├─ user.prisma
+│     ├─ room.prisma
+│     ├─ member.prisma
+│     ├─ message.prisma
+│     └─ invitation.prisma
 ├─ .env
-├─ bunfig.toml
 ├─ package.json
 └─ tsconfig.json
 ```
@@ -491,57 +487,58 @@ src/
 ├─ controllers/
 ├─ services/
 ├─ repositories/
-├─ models/
-└─ utils/
+└─ models/
 
 ✅ BIEN (Vertical Slices):
-src/features/
-├─ auth/
-│  ├─ controller.ts
-│  ├─ service.ts
-│  ├─ validator.ts
-│  └─ types.ts
+source/features/
+├─ identity/
+│  ├─ plugin.ts
+│  ├─ signin/
+│  │  ├─ signin.handler.ts
+│  │  └─ signin.schema.ts
+│  └─ signup/
+│     ├─ signup.handler.ts
+│     └─ signup.schema.ts
 ├─ rooms/
-│  ├─ controller.ts
-│  ├─ service.ts
-│  ├─ validator.ts
-│  └─ types.ts
-└─ messages/
-   ├─ controller.ts
-   ├─ service.ts
-   ├─ validator.ts
-   └─ types.ts
+│  ├─ plugin.ts
+│  └─ create-room/
+│     ├─ create-room.handler.ts
+│     └─ create-room.schema.ts
+└─ invites/
+   ├─ plugin.ts
+   └─ send-invitation/
+      ├─ send-invitation.handler.ts
+      └─ send-invitation.schema.ts
 ```
 
 **Diagrama de Slice:**
 
-```
-┌────────────────────────────────────┐
-│     Auth Slice (Feature)           │
+```Identity Slice (Feature)         │
 │                                    │
 │  ┌──────────────────────────────┐ │
-│  │  Controller (Routes)         │ │
-│  │  POST /auth/register         │ │
-│  │  POST /auth/login            │ │
+│  │  Plugin (Routes)             │ │
+│  │  POST /auth/signin           │ │
+│  │  POST /auth/signup           │ │
 │  └──────────────────────────────┘ │
 │              ↓                     │
 │  ┌──────────────────────────────┐ │
-│  │  Service (Business Logic)    │ │
+│  │  Handler (Business Logic)    │ │
+│  │  - Validate credentials      │ │
 │  │  - Hash password             │ │
 │  │  - Generate JWT              │ │
-│  │  - Validate credentials      │ │
 │  └──────────────────────────────┘ │
 │              ↓                     │
 │  ┌──────────────────────────────┐ │
-│  │  Data Access (Prisma)        │ │
-│  │  - prisma.user.create()      │ │
-│  │  - prisma.user.findUnique()  │ │
+│  │  DAO (Data Access)           │ │
+│  │  - dao.create()              │ │
+│  │  - dao.obtain()              │ │
 │  └──────────────────────────────┘ │
 │              ↓                     │
 │  ┌──────────────────────────────┐ │
-│  │  Database (PostgreSQL)       │ │
+│  │  Prisma → PostgreSQL         │ │
 │  └──────────────────────────────┘ │
 │                                    │
+│  ✅ Schema (Zod validation)         │
 │  ✅ Validator (Zod)               │
 │  ✅ Types (TypeScript)            │
 └────────────────────────────────────┘
@@ -554,103 +551,52 @@ src/features/
 - 📚 Documentación autodocumentada
 - 🔄 Bajo acoplamiento entre slices
 
-**Ejemplo de Slice `messages`:**
+**Ejemplo de Slice `identity`:**
 
 ```typescript
-// messages/messages.types.ts
-export interface SendMessageRequest {
-  roomId: string;
-  content: string;
-}
-
-export interface MessageResponse {
-  id: string;
-  content: string;
-  senderId: string;
-  roomId: string;
-  createdAt: Date;
-}
-
-// messages/messages.validator.ts
-import { z } from 'zod';
-
-export const sendMessageSchema = z.object({
-  roomId: z.string().uuid(),
-  content: z.string().min(1).max(1000)
+// signin/signin.schema.ts
+export const SignInBody = t.Object({
+  email: t.String(),
+  password: t.String()
 });
 
-// messages/messages.service.ts
-export const messagesService = {
-  async sendMessage(
-    userId: string,
-    roomId: string,
-    content: string
-  ) {
-    // 1. Validar membresía
-    const member = await prisma.member.findUnique({
-      where: {
-        userId_roomId: { userId, roomId }
-      }
-    });
+export const SignInResponse = t.Object({
+  token: t.String()
+});
 
-    if (!member) {
-      throw new Error('No membership');
-    }
+// signin/signin.handler.ts
+export class SignInHandler {
+  constructor(private dao: IUserDao) {}
 
-    // 2. Crear mensaje
-    const message = await prisma.message.create({
-      data: {
-        content,
-        senderId: userId,
-        roomId
-      }
-    });
+  async handle(req: SignInRequest): Promise<SignInPayload> {
+    const user = await this.dao.obtain(req.body);
+    if (!user) throw new Error("User does not exist");
 
-    // 3. Update Redis cache
-    await redis.lpush(
-      `room:${roomId}:messages`,
-      JSON.stringify(message)
+    const isValid = await Bun.password.verify(
+      req.body.password, 
+      user.password
     );
-    await redis.ltrim(`room:${roomId}:messages`, 0, 99);
+    if (!isValid) throw new Error("Invalid password");
 
-    // 4. Broadcast event
-    socketServer.to(roomId).emit('message:new', message);
-
-    return message;
+    return { userId: user.id };
   }
-};
+}
 
-// messages/messages.controller.ts
-export const messagesController = (app: Elysia) =>
-  app.post('/rooms/:roomId/messages', 
-    async ({ params: { roomId }, body, user }) => {
-      const validated = sendMessageSchema.parse(body);
-      
-      return messagesService.sendMessage(
-        user.id,
-        roomId,
-        validated.content
-      );
-    },
-    {
-      body: z.object({
-        content: z.string().min(1).max(1000)
-      }),
-      beforeHandle: ({ user }) => {
-        if (!user) throw new Unauthorized();
-      }
-    }
-  );
-
-// messages/index.ts
-export const messagesPlugin = (app: Elysia) =>
-  app
-    .use(messagesController)
-    .ws('/rooms/:roomId/messages', {
-      open: (ws) => { /* handle connection */ },
-      message: (ws, message) => { /* handle message */ },
-      close: (ws) => { /* handle disconnect */ }
-    });
+// plugin.ts
+export const IdentityPlugin = new Elysia({ name: "identity", prefix: "/auth" })
+  .use(PrismaPlugin)
+  .derive(({ prisma }) => ({
+    signInH: new SignInHandler(new UserDao(prisma))
+  }))
+  .post("/signin", async ({ body, jwt, signInH }) => {
+    const payload = await signInH.handle({ body });
+    const token = await jwt.sign(payload);
+    return { token };
+  }, {
+    body: SignInBody,
+    response: { 200: SignInResponse }
+  });
+```
 ```
 
 ---
@@ -661,23 +607,16 @@ export const messagesPlugin = (app: Elysia) =>
 ElysiaJS usa **plugins** para composición modular.
 
 ```typescript
-// app.ts
-const app = new Elysia()
-  // Core plugins
-  .use(cors())
-  .use(jwt({ secret: env.JWT_SECRET }))
-  
-  // Feature plugins
-  .use(authPlugin)
-  .use(roomsPlugin)
-  .use(messagesPlugin)
-  .use(invitationsPlugin)
-  
-  // Middleware
-  .use(errorHandlerPlugin)
-  
-  // Start
-  .listen(env.PORT);
+// boot.ts
+const app = new Elysia({ prefix: "/api" })
+  .use(CorsPlugin)
+  .use(ScalarPlugin)      // API docs
+  .use(HealthPlugin)      // Health check
+  .use(IdentityPlugin)    // Auth
+  .use(ProfilePlugin)     // User profile
+  .use(RoomsPlugin)       // Rooms
+  .use(InvitationsPlugin) // Invitations
+  .listen(process.env.PORT!);
 ```
 
 **Ventajas:**
@@ -688,23 +627,40 @@ const app = new Elysia()
 
 ---
 
-#### 3️⃣ Middleware Chain
+#### 3️⃣ DAO Pattern (Data Access Layer)
 
+**Concepto:**
+Capa separada para acceso a datos con interfaces y queries.
+
+```typescript
+// users/user.idao.ts
+export interface IUserDao {
+  create(args: Create.Args): Promise<User>;
+  update(args: Update.Args): Promise<User>;
+  search(args: Search.Args): Promise<User[]>;
+  obtain(args: Obtain.Args): Promise<User | null>;
+}
+
+// users/user.dao.ts
+export class UserDao implements IUserDao {
+  constructor(private prisma: PrismaClient) {}
+
+  async create(args: Create.Args) {
+    return await this.prisma.user.create(Create.query(args));
+  }
+
+  async obtain(args: Obtain.Args) {
+    return await this.prisma.user.findFirst(Obtain.query(args));
+  }
+  // ... otros métodos
+}
 ```
-Request
-  ↓
-[CORS]
-  ↓
-[JWT Verification]
-  ↓
-[Route Handler]
-  ├─ [Validation]
-  ├─ [Authorization]
-  ├─ [Service Logic]
-  └─ [Database Access]
-  ↓
-Response
-```
+
+**Beneficios:**
+- 🧪 Testeable (fácil mockear)
+- 🎯 Queries reutilizables
+- 📦 Encapsulación de lógica de DB
+- 🔄 Fácil cambiar ORM
 
 ---
 
@@ -732,62 +688,69 @@ Response
 - ✅ Migrations
 - ✅ Type generation
 
+**Estructura Modular:**
+```
+prisma/
+├─ schema.prisma          # Schema principal (imports)
+└─ models/                # Modelos separados
+   ├─ user.prisma
+   ├─ room.prisma
+   ├─ member.prisma
+   ├─ message.prisma
+   └─ invitation.prisma
+```
+
 **Ejemplo:**
 
 ```typescript
-// prisma/schema.prisma
+// prisma/models/user.prisma
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String   @unique
-  password  String
-  members   Member[]
-  messages  Message[]
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  email    String @unique
+  password String
+
+  members     Member[]
+  messages    Message[]
+  invitations Invitation[]
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+  @@schema("mango")
 }
 
-model Room {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  members   Member[]
-  messages  Message[]
-  createdAt DateTime @default(now())
-}
-
+// prisma/models/member.prisma
 model Member {
-  id        String   @id @default(cuid())
-  userId    String
-  roomId    String
-  role      Role     @default(USER)
-  status    Status   @default(ACTIVE)
-  user      User     @relation(fields: [userId], references: [id])
-  room      Room     @relation(fields: [roomId], references: [id])
+  id     Int          @id @default(autoincrement())
+  role   MemberRole   @default(USER)
+  status MemberStatus @default(ACTIVE)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  roomId Int
+  room   Room @relation(fields: [roomId], references: [id])
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, roomId])
+  @@map("members")
+  @@schema("mango")
 }
 
-model Message {
-  id        String   @id @default(cuid())
-  content   String
-  senderId  String
-  roomId    String
-  sender    User     @relation(fields: [senderId], references: [id])
-  room      Room     @relation(fields: [roomId], references: [id])
-  createdAt DateTime @default(now())
-
-  @@index([roomId])
-  @@index([senderId])
-}
-
-enum Role {
+enum MemberRole {
   ADMIN
   USER
+  @@schema("mango")
 }
 
-enum Status {
+enum MemberStatus {
   ACTIVE
   LEAVED
+  @@schema("mango")
 }
 ```
 
@@ -864,41 +827,25 @@ Client               Backend
 **Ejemplo de WebSocket handler:**
 
 ```typescript
-// websocket/handlers/messageHandler.ts
-export const messageHandler = (socket: Socket) => {
-  socket.on('message:send', async (data) => {
-    const { roomId, content } = data;
-    
-    try {
-      // 1. Validar
-      const member = await validateMembership(
-        socket.user.id,
-        roomId
-      );
-      
-      // 2. Procesar
-      const message = await messagesService.sendMessage(
-        socket.user.id,
-        roomId,
-        content
-      );
-      
-      // 3. Broadcast
-      socket.to(roomId).emit('message:new', {
-        id: message.id,
-        content: message.content,
-        sender: { id: message.senderId, name: message.sender.name },
-        createdAt: message.createdAt
-      });
-      
-      // 4. Confirmar al sender
-      socket.emit('message:sent', { id: message.id });
-      
-    } catch (error) {
-      socket.emit('error', { message: error.message });
-    }
+// Ejemplo simplificado (WebSocket en desarrollo)
+socket.on('message:send', async (data) => {
+  const { roomId, content } = data;
+  
+  // 1. Validar membresía
+  const member = await prisma.member.findUnique({
+    where: { userId_roomId: { userId: socket.user.id, roomId } }
   });
-};
+  if (!member) throw new Error("Not a member");
+  
+  // 2. Persistir mensaje
+  const message = await prisma.message.create({
+    data: { content, senderId: socket.user.id, roomId }
+  });
+  
+  // 3. Broadcast a la sala
+  socket.to(roomId).emit('message:new', message);
+  socket.emit('message:sent', { id: message.id });
+});
 ```
 
 ---

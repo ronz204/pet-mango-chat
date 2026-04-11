@@ -32,10 +32,12 @@ Representa un usuario registrado en el sistema.
 
 | Campo | Tipo | Restricciones |
 |-------|------|---------------|
-| `id` | UUID | Primary Key |
+| `id` | Int | Primary Key, Auto-increment |
 | `name` | String | UNIQUE, NOT NULL |
 | `email` | String | UNIQUE, NOT NULL |
 | `password` | String | NOT NULL |
+| `createdAt` | DateTime | DEFAULT now() |
+| `updatedAt` | DateTime | Auto-update |
 
 **Relaciones:**
 - ➜ `members` (1:N) — Membresías en salas
@@ -50,8 +52,10 @@ Representa un espacio de grupo de chat.
 
 | Campo | Tipo | Restricciones |
 |-------|------|---------------|
-| `id` | UUID | Primary Key |
+| `id` | Int | Primary Key, Auto-increment |
 | `name` | String | UNIQUE, NOT NULL |
+| `createdAt` | DateTime | DEFAULT now() |
+| `updatedAt` | DateTime | Auto-update |
 
 **Relaciones:**
 - ➜ `members` (1:N) — Miembros de la sala
@@ -68,12 +72,13 @@ Representa la membresía de un usuario en una sala.
 
 | Campo | Tipo | Restricciones |
 |-------|------|---------------|
-| `id` | UUID | Primary Key |
-| `role` | ENUM | `ADMIN` \| `USER` |
-| `status` | ENUM | `ACTIVE` \| `LEAVED` |
-| `userId` | UUID | Foreign Key → User |
-| `roomId` | UUID | Foreign Key → Room |
-| `createdAt` | DateTime | NOT NULL |
+| `id` | Int | Primary Key, Auto-increment |
+| `role` | ENUM | `ADMIN` \| `USER`, DEFAULT `USER` |
+| `status` | ENUM | `ACTIVE` \| `LEAVED`, DEFAULT `ACTIVE` |
+| `userId` | Int | Foreign Key → User |
+| `roomId` | Int | Foreign Key → Room |
+| `createdAt` | DateTime | DEFAULT now() |
+| `updatedAt` | DateTime | Auto-update |
 
 **Restricción Única:**
 ```
@@ -93,11 +98,12 @@ Representa un mensaje enviado en una sala.
 
 | Campo | Tipo | Restricciones |
 |-------|------|---------------|
-| `id` | UUID | Primary Key |
+| `id` | Int | Primary Key, Auto-increment |
 | `content` | String | NOT NULL |
-| `senderId` | UUID | Foreign Key → User |
-| `roomId` | UUID | Foreign Key → Room |
-| `createdAt` | DateTime | NOT NULL, DEFAULT now() |
+| `senderId` | Int | Foreign Key → User |
+| `roomId` | Int | Foreign Key → Room |
+| `createdAt` | DateTime | DEFAULT now() |
+| `updatedAt` | DateTime | Auto-update |
 
 **Relaciones:**
 - ➜ `sender` — Usuario que envió el mensaje
@@ -105,18 +111,20 @@ Representa un mensaje enviado en una sala.
 
 ---
 
+
 ### ✉️ Invitation
 
 Controla el acceso a las salas (modelo explícito de autorización).
 
-| Campo | Tipo | Restricciones |
-|-------|------|---------------|
-| `id` | UUID | Primary Key |
-| `status` | ENUM | `PENDING` \| `ACCEPTED` \| `DECLINED` \| `EXPIRED` |
-| `inviteeId` | UUID | Foreign Key → User |
-| `roomId` | UUID | Foreign Key → Room |
-| `createdAt` | DateTime | NOT NULL |
-| `expiresAt` | DateTime | Nullable |
+| Campo        | Tipo     | Restricciones                                         |
+|--------------|----------|------------------------------------------------------|
+| `id`         | Int      | Primary Key, Auto-increment                          |
+| `status`     | ENUM     | `PENDING` \| `ACCEPTED` \| `DECLINED` \| `EXPIRED`, DEFAULT `PENDING` |
+| `inviteeId`  | Int      | Foreign Key → User                                   |
+| `roomId`     | Int      | Foreign Key → Room                                   |
+| `createdAt`  | DateTime | DEFAULT now()                                        |
+| `expiresAt`  | DateTime | Nullable                                             |
+| `updatedAt`  | DateTime | Auto-update                                          |
 
 **Responsabilidades:**
 - Representa estado pre-membresía
@@ -301,24 +309,28 @@ Broadcast a todos en sala
 
 ```javascript
 async sendMessage(roomId, userId, content) {
-  // 1. Validar
-  const member = await db.member.findUnique({
-    where: { userId_roomId: { userId, roomId } }
+  // 1. Validar membresía
+  const member = await prisma.member.findUnique({
+    where: { 
+      userId_roomId: { userId, roomId } 
+    }
   });
-  if (!member) throw new Error("No membership");
+  if (!member) throw new Error("Not a member");
 
-  // 2. Persistir
-  const message = await db.message.create({
+  // 2. Persistir en DB
+  const message = await prisma.message.create({
     data: { content, senderId: userId, roomId }
   });
 
-  // 3. Cache
+  // 3. Actualizar cache Redis
   await redis.lpush(`room:${roomId}:messages`, 
     JSON.stringify(message));
   await redis.ltrim(`room:${roomId}:messages`, 0, 99);
 
-  // 4. Broadcast
+  // 4. Broadcast en tiempo real
   io.to(roomId).emit('message:new', message);
+  
+  return message;
 }
 ```
 
@@ -339,20 +351,23 @@ Todos ven indicador en tiempo real
 **Código Ejemplo:**
 
 ```javascript
+// Cuando usuario empieza a escribir
 onUserTyping(roomId, userId) {
   const now = Date.now();
+  
+  // Agregar usuario a typing set con timestamp
   redis.zadd(`room:${roomId}:typing`, now, userId);
   
-  // Limpiar stales cada 5 segundos
+  // Limpiar usuarios que dejaron de escribir hace >5s
   redis.zremrangebyscore(
     `room:${roomId}:typing`, 
     0, 
     now - 5000
   );
   
-  io.to(roomId).emit('typing:update', {
-    typing: redis.zrange(`room:${roomId}:typing`, 0, -1)
-  });
+  // Obtener lista actualizada y broadcast
+  const typing = await redis.zrange(`room:${roomId}:typing`, 0, -1);
+  io.to(roomId).emit('typing:update', { typing });
 }
 ```
 
@@ -369,26 +384,24 @@ User (WebSocket)
 Todos ven quién está online
 ```
 
-**Código Ejemplo:**
-
+socket.on('disconnect', async () => {
 ```javascript
+// Conexión
 socket.on('connect', async () => {
-  const roomId = socket.handshake.data.roomId;
-  const userId = socket.handshake.data.userId;
-  
+  const { roomId, userId } = socket.handshake.data;
   // Agregar a presencia
   await redis.sadd(`room:${roomId}:online`, userId);
-  
-  // Notificar
-  io.to(roomId).emit('user:online', {
-    online: await redis.smembers(`room:${roomId}:online`)
-  });
+  // Notificar a todos
+  const online = await redis.smembers(`room:${roomId}:online`);
+  io.to(roomId).emit('user:online', { online });
 });
 
+// Desconexión
 socket.on('disconnect', async () => {
   await redis.srem(`room:${roomId}:online`, userId);
   io.to(roomId).emit('user:offline', { userId });
 });
+```
 ```
 
 ---
@@ -413,17 +426,20 @@ Redis = Cache (puede perderse)
 **Estrategia de Invalidación:**
 
 ```javascript
-// Cuando actualizar un dato crítico
+// Al actualizar datos críticos
 async updateRoom(roomId, data) {
-  // 1. Actualizar DB
-  await db.room.update({ where: { id: roomId }, data });
+  // 1. Actualizar DB (fuente de verdad)
+  await prisma.room.update({ 
+    where: { id: roomId }, 
+    data 
+  });
   
   // 2. Invalidar caches relacionadas
   await redis.del(`room:${roomId}:messages`);
   await redis.del(`room:${roomId}:online`);
   await redis.del(`room:${roomId}:typing`);
   
-  // 3. Notificar
+  // 3. Notificar cambios
   io.to(roomId).emit('room:updated', { roomId });
 }
 ```
