@@ -13,6 +13,7 @@
     /* Module Resolution */
     "paths": {
       "@api/*": ["./src/api/*"],
+      "@assets/*": ["./src/assets/*"],
 
       "@guards/*": ["./src/shared/guards/*"],
       "@stores/*": ["./src/shared/stores/*"],

@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [vue(), tailwindcss()],
   resolve: { alias: {
     "@api": "/src/api",
+    "@assets": "/src/assets",
 
     "@guards": "/src/shared/guards",
     "@stores": "/src/shared/stores",
