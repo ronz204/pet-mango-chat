@@ -8,12 +8,17 @@ import type { SignInRequest } from "@schemas/signin.schema";
 import SignInForm from "../components/organisms/SignInForm.vue";
 
 import { IdentityProvider } from "@providers/identity/identity.provider";
+import { useSessionStore } from "@stores/session.store";
 
 const router = useRouter();
+const session = useSessionStore();
 
 const { mutate: signIn, isPending, isError, error } = useMutation({
   mutationFn: (data: SignInRequest) => IdentityProvider.signIn(data),
-  onSuccess: () => router.push("/"),
+  onSuccess: ({ token }) => {
+    session.setToken(token);
+    router.push("/");
+  },
 });
 </script>
 
