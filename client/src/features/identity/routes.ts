@@ -7,10 +7,12 @@ export const IdentityRoutes: RouteRecordRaw[] = [
     name: "sign-in",
     path: "/sign-in",
     component: SignInContainer,
+    meta: { requiresGuest: true },
   },
   {
     name: "sign-up",
     path: "/sign-up",
     component: SignUpContainer,
+    meta: { requiresGuest: true },
   },
 ];
