@@ -1,6 +1,6 @@
 import type { IUserDao } from "@dal/users/user.idao";
-import type { SignInRequest } from "./signin.schema";
-import type { SignInPayload } from "./signin.schema";
+import type { SignInRequest } from "./signin-user.schema";
+import type { SignInPayload } from "./signin-user.schema";
 
 export class SignInHandler {
   constructor(private dao: IUserDao) {};
