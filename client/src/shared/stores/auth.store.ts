@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 
 const TOKEN_KEY: string = "mango:token";
 
-export const useSessionStore = defineStore("session", () => {
+export const useAuthStore = defineStore("auth", () => {
   const token = ref<string | null>(localStorage.getItem(TOKEN_KEY));
   const isAuthenticated = computed(() => token.value !== null);
 
