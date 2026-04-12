@@ -1,4 +1,5 @@
 import { createWebHistory, createRouter } from "vue-router";
+import { identityRoutes } from "@features/identity/routes";
 import Sample from "./Sample.vue";
 
 export const router = createRouter({
@@ -9,5 +10,6 @@ export const router = createRouter({
       name: "Sample",
       component: Sample,
     },
+    ...identityRoutes,
   ],
 });
