@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: { alias: {
     "@api": "/src/api",
     "@assets": "/src/assets",
+    "@features": "/src/features",
 
     "@guards": "/src/shared/guards",
     "@stores": "/src/shared/stores",

@@ -1,6 +1,94 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* ─────────────────────────────────────────────────────────────────────────
+ * Design Tokens — Mango Chat
+ *
+ * Three layers, each with a clear purpose:
+ *
+ *  1. :root        — Nuxt UI --ui-* overrides. Single source of truth for
+ *                    all color values; applied to both UI components and
+ *                    the Tailwind utility mappings below.
+ *
+ *  2. @theme       — Tailwind tokens with literal values only (fonts).
+ *                    Generates the corresponding utility classes.
+ *
+ *  3. @theme inline — Tailwind color utilities that reference --ui-* vars.
+ *                    Uses `inline` so utility classes output var() directly
+ *                    instead of creating an extra CSS variable indirection.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+/* ─── 1. Nuxt UI overrides ──────────────────────────────────────────────── */
 :root {
-  --ui-primary: oklch(0.70 0.19 45);
+  /* Semantic palette
+   *   Primary   #FF8235  →  oklch(0.70 0.187 46)   mango orange
+   *   Secondary #FF6B6B  →  oklch(0.65 0.180 21)   coral
+   *   Success   #74B043  →  oklch(0.63 0.144 128)   green
+   *   Neutral   #606060  →  oklch(0.48 0     0)     gray
+   */
+  --ui-primary:   oklch(0.70 0.187 46);
+  --ui-secondary: oklch(0.65 0.180 21);
+  --ui-success:   oklch(0.63 0.144 128);
+  --ui-warning:   oklch(0.78 0.160 72);
+  --ui-error:     oklch(0.55 0.220 25);
+  --ui-info:      oklch(0.60 0.140 240);
+
+  /* Backgrounds — warm, light */
+  --ui-bg:          oklch(1    0     0);
+  --ui-bg-muted:    oklch(0.975 0.006 80);
+  --ui-bg-elevated: oklch(1    0.002 80);
+  --ui-bg-accented: oklch(0.93 0.008 80);
+  --ui-bg-inverted: oklch(0.20 0.010 60);
+
+  /* Borders */
+  --ui-border:          oklch(0.90 0.007 80);
+  --ui-border-muted:    oklch(0.94 0.005 80);
+  --ui-border-accented: oklch(0.85 0.010 80);
+  --ui-border-inverted: oklch(0.20 0.010 60);
+
+  /* Text */
+  --ui-text-dimmed:      oklch(0.63 0.012 80);
+  --ui-text-muted:       oklch(0.52 0.014 80);
+  --ui-text-toned:       oklch(0.41 0.014 80);
+  --ui-text:             oklch(0.17 0.010 80);
+  --ui-text-highlighted: oklch(0.10 0.006 80);
+  --ui-text-inverted:    oklch(1    0     0);
+
+  /* Radius */
+  --ui-radius: 0.5rem;
+}
+
+
+
+/* ─── 2. Tailwind theme variables (literal values) ───────────────────────── */
+@theme {
+  --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
+}
+
+/* ─── 3. Tailwind color utilities (mapped to --ui-* via @theme inline) ───── */
+@theme inline {
+  /* Surfaces */
+  --color-background: var(--ui-bg);
+  --color-card:       var(--ui-bg-elevated);
+  --color-secondary:  var(--ui-bg-muted);
+  --color-accent:     var(--ui-bg-accented);
+
+  /* Text */
+  --color-foreground:           var(--ui-text);
+  --color-muted-foreground:     var(--ui-text-muted);
+  --color-card-foreground:      var(--ui-text);
+  --color-secondary-foreground: var(--ui-text-toned);
+  --color-accent-foreground:    var(--ui-text);
+  --color-primary:              var(--ui-primary);
+  --color-primary-foreground:   var(--ui-text-inverted);
+
+  /* Borders & focus */
+  --color-border: var(--ui-border);
+  --color-input:  var(--ui-border);
+  --color-ring:   var(--ui-border-accented);
+
+  /* Feedback */
+  --color-destructive:            var(--ui-error);
+  --color-destructive-foreground: var(--ui-text-inverted);
 }
