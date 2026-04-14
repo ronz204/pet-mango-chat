@@ -19,7 +19,6 @@ export const GetRoomDetailsRequest = t.Object({
 export const GetRoomDetailsResponse = t.Object({
   id: t.Number(),
   name: t.String(),
-  members: t.Array(MemberDto),
 });
 
 export type GetRoomDetailsRequest = Static<typeof GetRoomDetailsRequest>;

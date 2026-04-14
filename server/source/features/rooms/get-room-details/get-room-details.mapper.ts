@@ -6,12 +6,12 @@ export class GetRoomDetailsMapper {
     return {
       id: data.id,
       name: data.name,
-      members: data.members.map(member => ({
+      /* members: data.members.map(member => ({
         id: member.id,
         userId: member.userId,
         userName: member.user.name,
         userRole: member.role,
-      })),
+      })), */
     };
   };
 };
