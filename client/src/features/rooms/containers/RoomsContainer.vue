@@ -35,13 +35,12 @@ const { data: room, isPending: loadingRoom } = useGetRoomDetails(roomId);
     <template #default>
       <template v-if="roomId">
         <!-- Room header -->
-        <RoomHeader :room-name="room?.name" :loading="loadingRoom" />
+        <RoomHeader :room-id="roomId" :room-name="room?.name" :loading="loadingRoom" />
 
         <!-- Messages area (coming soon) -->
         <div class="flex-1 overflow-y-auto flex items-center justify-center">
           <div class="flex flex-col items-center gap-5 p-8 text-center max-w-sm">
-            <div
-              class="size-16 rounded-2xl flex items-center justify-center shadow-sm"
+            <div class="size-16 rounded-2xl flex items-center justify-center shadow-sm"
               style="background: linear-gradient(135deg, oklch(0.70 0.187 46 / 0.12), oklch(0.65 0.180 21 / 0.08))">
               <UIcon name="i-lucide-message-square-dashed" class="text-3xl text-primary/50" />
             </div>
@@ -58,13 +57,11 @@ const { data: room, isPending: loadingRoom } = useGetRoomDetails(roomId);
       <!-- No room selected -->
       <div v-else class="flex flex-col items-center justify-center gap-6 flex-1 p-8 text-center">
         <div class="relative">
-          <div
-            class="size-20 rounded-3xl flex items-center justify-center shadow-md"
+          <div class="size-20 rounded-3xl flex items-center justify-center shadow-md"
             style="background: linear-gradient(145deg, oklch(0.70 0.187 46 / 0.14), oklch(0.65 0.180 21 / 0.10))">
             <UIcon name="i-lucide-hash" class="text-4xl" style="color: oklch(0.70 0.187 46 / 0.5)" />
           </div>
-          <div
-            class="absolute -top-1.5 -right-1.5 size-5 rounded-full border-2 border-background shadow-sm"
+          <div class="absolute -top-1.5 -right-1.5 size-5 rounded-full border-2 border-background shadow-sm"
             style="background: linear-gradient(135deg, oklch(0.70 0.187 46), oklch(0.58 0.180 38))" />
         </div>
         <div class="space-y-2">
