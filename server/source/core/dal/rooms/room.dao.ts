@@ -5,6 +5,7 @@ import { Own } from "./queries/own.query";
 import { Create } from "./queries/create.query";
 import { Obtain } from "./queries/obtain.query";
 import { Details } from "./queries/details.query";
+import { Members } from "./queries/members.query";
 
 export class RoomDao implements IRoomDao {
   constructor(private prisma: PrismaClient) {};
@@ -23,5 +24,9 @@ export class RoomDao implements IRoomDao {
 
   public async details(args: Details.Args) {
     return await this.prisma.room.findUnique(Details.query(args));
+  };
+
+  public async members(args: Members.Args) {
+    return await this.prisma.member.findMany(Members.query(args));
   };
 };
