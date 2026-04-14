@@ -39,31 +39,42 @@ const { data: room, isPending: loadingRoom } = useGetRoomDetails(roomId);
 
         <!-- Messages area (coming soon) -->
         <div class="flex-1 overflow-y-auto flex items-center justify-center">
-          <div class="flex flex-col items-center gap-3 p-8 text-center max-w-xs">
+          <div class="flex flex-col items-center gap-5 p-8 text-center max-w-sm">
             <div
-              class="size-14 rounded-full bg-[oklch(0.70_0.187_46/0.10)] flex items-center justify-center text-2xl text-primary">
-              <UIcon name="i-lucide-message-square-dashed" />
+              class="size-16 rounded-2xl flex items-center justify-center shadow-sm"
+              style="background: linear-gradient(135deg, oklch(0.70 0.187 46 / 0.12), oklch(0.65 0.180 21 / 0.08))">
+              <UIcon name="i-lucide-message-square-dashed" class="text-3xl text-primary/50" />
             </div>
-            <h3 class="text-base font-semibold text-highlighted m-0">Messages coming soon</h3>
-            <p class="text-sm text-muted leading-relaxed m-0">
-              The messaging engine is still being built.
-              <br />Hang tight — conversations are on their way.
-            </p>
+            <div class="space-y-2">
+              <h3 class="text-base font-bold text-highlighted m-0">Messages coming soon</h3>
+              <p class="text-sm text-muted leading-relaxed m-0">
+                The messaging engine is on its way.<br />Hang tight — conversations are almost here.
+              </p>
+            </div>
           </div>
         </div>
       </template>
 
       <!-- No room selected -->
-      <div v-else class="flex flex-col items-center justify-center gap-3 flex-1 p-8 text-center">
-        <div class="size-16 rounded-full bg-accented flex items-center justify-center text-[1.75rem] text-dimmed">
-          <UIcon name="i-lucide-hash" />
+      <div v-else class="flex flex-col items-center justify-center gap-6 flex-1 p-8 text-center">
+        <div class="relative">
+          <div
+            class="size-20 rounded-3xl flex items-center justify-center shadow-md"
+            style="background: linear-gradient(145deg, oklch(0.70 0.187 46 / 0.14), oklch(0.65 0.180 21 / 0.10))">
+            <UIcon name="i-lucide-hash" class="text-4xl" style="color: oklch(0.70 0.187 46 / 0.5)" />
+          </div>
+          <div
+            class="absolute -top-1.5 -right-1.5 size-5 rounded-full border-2 border-background shadow-sm"
+            style="background: linear-gradient(135deg, oklch(0.70 0.187 46), oklch(0.58 0.180 38))" />
         </div>
-        <h3 class="text-lg font-semibold text-highlighted m-0">Pick a room</h3>
-        <p class="text-sm text-muted max-w-65 leading-relaxed m-0">
-          Select a room from the sidebar or create a new one.
-        </p>
+        <div class="space-y-2">
+          <h3 class="text-xl font-bold text-highlighted m-0">Welcome to Mango</h3>
+          <p class="text-sm text-muted max-w-60 leading-relaxed m-0">
+            Pick a room from the sidebar to start chatting with your team.
+          </p>
+        </div>
         <RouterLink to="/rooms/create">
-          <UButton variant="soft" icon="i-lucide-plus">
+          <UButton variant="soft" icon="i-lucide-plus" size="md">
             Create Room
           </UButton>
         </RouterLink>

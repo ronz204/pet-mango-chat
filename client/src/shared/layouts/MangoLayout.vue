@@ -6,7 +6,7 @@
     </header>
 
     <!-- Body: sidebar + main + members -->
-    <div class="grid grid-cols-[240px_1fr_220px] overflow-hidden">
+    <div class="grid grid-cols-[260px_1fr_240px] overflow-hidden">
       <aside class="border-r border-default bg-muted overflow-y-auto">
         <slot name="sidebar" />
       </aside>
