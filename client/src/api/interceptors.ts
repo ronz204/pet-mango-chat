@@ -2,7 +2,7 @@ import type { HttpInterceptor } from "./http.models";
 
 export const AuthInterceptor: HttpInterceptor = {
   onRequest: (request) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("mango:token");
     if (!token) return request;
 
     return {
