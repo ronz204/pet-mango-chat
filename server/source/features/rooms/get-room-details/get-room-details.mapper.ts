@@ -1,8 +1,8 @@
-import { Details } from "@dal/rooms/queries/details.query";
+import type { Room } from "@prisma/client";
 import type { GetRoomDetailsResponse } from "./get-room-details.schema";
 
 export class GetRoomDetailsMapper {
-  public static toResponse(data: Details.Result): GetRoomDetailsResponse {
+  public static toResponse(data: Room): GetRoomDetailsResponse {
     return {
       id: data.id,
       name: data.name,
