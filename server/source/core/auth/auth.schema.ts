@@ -1,4 +1,8 @@
-import { t } from "elysia";
+import { t, type Static } from "elysia";
+
+export const AuthQuery = t.Object({
+  token: t.String(),
+});
 
 export const AuthSchema = t.Object({
   userId: t.Number(),
@@ -14,3 +18,7 @@ export const AuthResponse = {
     message: t.String(),
   }),
 } as const;
+
+export type AuthQuery = Static<typeof AuthQuery>;
+export type AuthSchema = Static<typeof AuthSchema>;
+export type AuthHeaders = Static<typeof AuthHeaders>;
