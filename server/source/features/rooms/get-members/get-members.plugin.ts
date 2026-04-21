@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
-import { RoomDao } from "@dal/rooms/room.dao";
 import { AuthPlugin } from "@auth/auth.plugin";
-import { PrismaPlugin } from "@plugins/prisma.plugin";
+import { MemberDao } from "@dal/member/member.dao";
+import { PrismaPlugin } from "@database/prisma.plugin";
 
 import { GetMembersHandler } from "./get-members.handler";
 import { GetMembersParams, GetMembersResponse } from "./get-members.schema";
@@ -13,7 +13,7 @@ export const GetMembersPlugin = new Elysia({ name })
   .use(PrismaPlugin)
 
   .derive(({ prisma }) => {
-    const dao = new RoomDao(prisma);
+    const dao = new MemberDao(prisma);
     const handler = new GetMembersHandler(dao);
 
     return { handler };

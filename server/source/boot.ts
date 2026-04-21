@@ -5,9 +5,9 @@ import { HealthPlugin } from "@plugins/health.plugin";
 import { ScalarPlugin } from "@plugins/scalar.plugin";
 
 import { RoomsPlugin } from "@features/rooms/plugin";
-import { ProfilePlugin } from "@features/profile/plugin";
-import { IdentityPlugin } from "@features/identity/plugin";
-import { InvitationsPlugin } from "@features/invites/plugin";
+import { ProfilePlugin } from "@features/profile/profile.plugin";
+import { IdentityPlugin } from "@features/identity/identity.plugin";
+import { InvitationsPlugin } from "@features/invitation/invitation.plugin";
 
 const app = new Elysia({ prefix: "/api" })
   .use(CorsPlugin)

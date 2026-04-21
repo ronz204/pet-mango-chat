@@ -8,8 +8,8 @@ type Response = GetMyRoomsResponse;
 export class GetMyRoomsHandler {
   constructor(private dao: IRoomDao) {};
 
-  public async handle(req: Request): Promise<Response> {
-    const rooms = await this.dao.own({ userId: req.userId });
+  public async handle({ userId }: Request): Promise<Response> {
+    const rooms = await this.dao.getOwn({ userId });
     return { rooms: rooms.map(room => ({ id: room.id, name: room.name })) };
   };
 };

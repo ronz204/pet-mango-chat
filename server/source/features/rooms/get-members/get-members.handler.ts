@@ -1,15 +1,17 @@
-import type { IRoomDao } from "@dal/rooms/room.idao";
-import type { GetMembersParams, GetMembersResponse } from "./get-members.schema";
-import { GetMembersMapper } from "./get-members.mapper";
+import type { IMemberDao } from "@dal/member/member.idao";
+import type { GetMembersRequest } from "./get-members.schema";
+import type { GetMembersResponse } from "./get-members.schema";
 
-type Request = { params: GetMembersParams };
+type Request = GetMembersRequest;
 type Response = GetMembersResponse;
 
-export class GetMembersHandler {
-  constructor(private dao: IRoomDao) {};
+import { GetMembersMapper } from "./get-members.mapper";
 
-  public async handle(req: Request): Promise<Response> {
-    const members = await this.dao.members({ roomId: req.params.roomId });
+export class GetMembersHandler {
+  constructor(private dao: IMemberDao) {};
+
+  public async handle({ params }: Request): Promise<Response> {
+    const members = await this.dao.readAll({ roomId: params.roomId });
     return GetMembersMapper.toResponse(members);
   };
 };

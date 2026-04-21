@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { AuthPlugin } from "@auth/auth.plugin";
-import { MemberDao } from "@dal/members/member.dao";
-import { PrismaPlugin } from "@plugins/prisma.plugin";
+import { MemberDao } from "@dal/member/member.dao";
+import { PrismaPlugin } from "@database/prisma.plugin";
 
 import { LeaveRoomParams } from "./leave-room.schema";
 import { LeaveRoomHandler } from "./leave-room.handler";

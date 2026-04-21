@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { RoomDao } from "@dal/rooms/room.dao";
 import { AuthPlugin } from "@auth/auth.plugin";
-import { PrismaPlugin } from "@plugins/prisma.plugin";
+import { PrismaPlugin } from "@database/prisma.plugin";
 
 import { GetMyRoomsHandler } from "./get-my-rooms.handler";
 import { GetMyRoomsResponse } from "./get-my-rooms.schema";

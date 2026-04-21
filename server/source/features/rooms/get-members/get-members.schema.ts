@@ -1,20 +1,17 @@
 import { t, type Static } from "elysia";
-import { MemberRole } from "@prisma/enums";
+import { MemberDto } from "@dal/member/member.dto";
 
 export const GetMembersParams = t.Object({
   roomId: t.Number(),
 });
 
-const MemberDto = t.Object({
-  id: t.Number(),
-  userId: t.Number(),
-  userName: t.String(),
-  role: t.Enum(MemberRole),
+export const GetMembersRequest = t.Object({
+  params: GetMembersParams,
 });
 
 export const GetMembersResponse = t.Object({
   members: t.Array(MemberDto),
 });
 
-export type GetMembersParams = Static<typeof GetMembersParams>;
+export type GetMembersRequest = Static<typeof GetMembersRequest>;
 export type GetMembersResponse = Static<typeof GetMembersResponse>;
