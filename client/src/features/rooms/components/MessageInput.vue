@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 defineProps<{
   roomName?: string;
@@ -9,14 +9,62 @@ defineProps<{
 
 const emit = defineEmits<{
   send: [content: string];
+  typingStart: [];
+  typingStop: [];
 }>();
 
 const content = ref("");
+let typingTimeout: ReturnType<typeof setTimeout> | null = null;
+let isTyping = ref(false);
+
+// Watch for content changes to emit typing events
+watch(content, (newValue) => {
+  if (newValue.trim().length > 0) {
+    // Start typing
+    if (!isTyping.value) {
+      emit("typingStart");
+      isTyping.value = true;
+    }
+
+    // Reset the stop timeout
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    // Auto-stop after 3 seconds of no typing
+    typingTimeout = setTimeout(() => {
+      if (isTyping.value) {
+        emit("typingStop");
+        isTyping.value = false;
+      }
+    }, 3000);
+  } else {
+    // Stop typing if input is empty
+    if (isTyping.value) {
+      emit("typingStop");
+      isTyping.value = false;
+    }
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+      typingTimeout = null;
+    }
+  }
+});
 
 const handleSubmit = () => {
   const trimmed = content.value.trim();
   if (!trimmed) return;
   
+  // Stop typing when sending
+  if (isTyping.value) {
+    emit("typingStop");
+    isTyping.value = false;
+  }
+  if (typingTimeout) {
+    clearTimeout(typingTimeout);
+    typingTimeout = null;
+  }
+
   emit("send", trimmed);
   content.value = "";
 };

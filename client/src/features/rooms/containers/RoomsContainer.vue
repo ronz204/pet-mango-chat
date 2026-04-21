@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, unref } from "vue";
+import { computed, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import MangoLayout from "@layouts/MangoLayout.vue";
@@ -9,14 +9,13 @@ import MembersSidebar from "../components/MembersSidebar.vue";
 import RoomHeader from "../components/RoomHeader.vue";
 import MessageList from "../components/MessageList.vue";
 import MessageInput from "../components/MessageInput.vue";
+import TypingIndicator from "../components/TypingIndicator.vue";
 
 import { useGetMyRooms } from "../services/useGetMyRooms";
 import { useGetMessages } from "../services/useGetMessages";
-import { useMessagesWebSocket } from "../services/useMessagesWebSocket";
-import { usePresenceWebSocket } from "../services/usePresenceWebSocket";
+import { useGetRoomMembers } from "../services/useGetRoomMembers";
+import { useRoomWebSockets } from "../services/useRoomWebSockets";
 import { useGetProfile } from "@features/identity/services/useGetProfile";
-
-import type { Message } from "../schemas/message.schema";
 
 const route = useRoute();
 
@@ -28,6 +27,7 @@ const roomId = computed(() => {
 const { data: rooms } = useGetMyRooms();
 const { data: profile } = useGetProfile();
 const { data: messagesData, isPending: loadingMessages } = useGetMessages(roomId);
+const { data: members } = useGetRoomMembers(roomId);
 
 // Find current room from the list
 const currentRoom = computed(() => {
@@ -35,114 +35,25 @@ const currentRoom = computed(() => {
   return rooms.value.find((r) => r.id === roomId.value);
 });
 
-// Local messages state
-const messages = ref<Message[]>([]);
-const isSending = ref(false);
-
-// Online users state
-const onlineUserIds = ref<Set<number>>(new Set());
-
-// WebSocket connections
-const wsInstance = ref<ReturnType<typeof useMessagesWebSocket> | null>(null);
-const presenceWsInstance = ref<ReturnType<typeof usePresenceWebSocket> | null>(null);
-
-// Computed for easier access
-const isWsConnected = computed(() => {
-  if (!wsInstance.value) return false;
-  return unref(wsInstance.value.isConnected);
-});
-
-// Initialize WebSocket when roomId changes
-watch(roomId, (newRoomId, oldRoomId) => {
-  // Cleanup previous connections
-  if (oldRoomId) {
-    if (wsInstance.value) {
-      wsInstance.value.disconnect();
-      wsInstance.value = null;
-    }
-    if (presenceWsInstance.value) {
-      presenceWsInstance.value.disconnect();
-      presenceWsInstance.value = null;
-    }
-  }
-
-  if (newRoomId) {
-    // Initialize messages WebSocket
-    wsInstance.value = useMessagesWebSocket({
-      roomId: newRoomId,
-      onMessage: (message) => {
-        // Add new message to the list if not already present
-        if (!messages.value.find((m) => m.id === message.id)) {
-          messages.value.push(message);
-        }
-        isSending.value = false;
-      },
-      onConnected: () => {
-        console.log("Messages WebSocket connected");
-      },
-      onDisconnected: () => {
-        console.log("Messages WebSocket disconnected");
-      },
-      onError: (error) => {
-        console.error("Messages WebSocket error:", error);
-        isSending.value = false;
-      },
-    });
-
-    // Initialize presence WebSocket
-    presenceWsInstance.value = usePresenceWebSocket({
-      roomId: newRoomId,
-      onOnlineList: (userIds) => {
-        onlineUserIds.value = new Set(userIds);
-      },
-      onUserOnline: (userId) => {
-        onlineUserIds.value.add(userId);
-        onlineUserIds.value = new Set(onlineUserIds.value);
-      },
-      onUserOffline: (userId) => {
-        onlineUserIds.value.delete(userId);
-        onlineUserIds.value = new Set(onlineUserIds.value);
-      },
-      onConnected: () => {
-        console.log("Presence WebSocket connected");
-      },
-      onDisconnected: () => {
-        console.log("Presence WebSocket disconnected");
-      },
-      onError: (error) => {
-        console.error("Presence WebSocket error:", error);
-      },
-    });
-
-    if (wsInstance.value) {
-      wsInstance.value.connect();
-    }
-    if (presenceWsInstance.value) {
-      presenceWsInstance.value.connect();
-    }
-  } else {
-    messages.value = [];
-    onlineUserIds.value = new Set();
-  }
-}, { immediate: true });
+// WebSockets unified
+const {
+  messages,
+  onlineUserIds,
+  typingUserIds,
+  isSending,
+  isMessagesConnected,
+  sendMessage,
+  sendTypingStart,
+  sendTypingStop,
+  setMessages,
+} = useRoomWebSockets({ roomId });
 
 // Update messages when data is loaded
 watch(messagesData, (newMessages) => {
   if (newMessages) {
-    messages.value = [...newMessages];
+    setMessages(newMessages);
   }
 }, { immediate: true });
-
-// Handle sending messages
-const handleSendMessage = (content: string) => {
-  if (!wsInstance.value || !isWsConnected.value) {
-    console.error("WebSocket not connected");
-    return;
-  }
-
-  isSending.value = true;
-  wsInstance.value.sendMessage(content);
-};
 </script>
 
 <template>
@@ -170,12 +81,21 @@ const handleSendMessage = (content: string) => {
           :loading="loadingMessages"
         />
 
+        <!-- Typing indicator -->
+        <TypingIndicator
+          :typing-user-ids="typingUserIds"
+          :members="members"
+          :current-user-id="profile?.id"
+        />
+
         <!-- Message input -->
         <MessageInput
           :room-name="currentRoom?.name"
-          :disabled="!isWsConnected"
+          :disabled="!isMessagesConnected"
           :sending="isSending"
-          @send="handleSendMessage"
+          @send="sendMessage"
+          @typing-start="sendTypingStart"
+          @typing-stop="sendTypingStop"
         />
       </template>
 
