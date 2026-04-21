@@ -24,18 +24,20 @@
     // Bun runtime types
     "types": ["@types/bun"],
 
-    // Path aliases
+    // Module resolution paths
     "paths": {
       "@seeders/*": ["./prisma/seeds/*"],
       "@prisma/*": ["./generated/prisma/*"],
 
       "@dal/*": ["./source/core/dal/*"],
       "@auth/*": ["./source/core/auth/*"],
+      "@cache/*": ["./source/core/cache/*"],
       
-      "@shared/*": ["./source/shared/*"],
       "@plugins/*": ["./source/plugins/*"],
       "@features/*": ["./source/features/*"],
       "@database/*": ["./source/database/*"],
+
+      "@errors/*": ["./source/shared/errors/*"],
     }
   }
 }
