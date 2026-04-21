@@ -5,7 +5,6 @@ import { useLeaveRoom } from "../services/useLeaveRoom";
 const props = defineProps<{
   roomId?: number | null;
   roomName?: string;
-  loading?: boolean;
 }>();
 
 const { mutate: leaveRoom, isPending: leaving } = useLeaveRoom();
@@ -34,14 +33,8 @@ const roomActions = computed(() => [
 
     <!-- Title area -->
     <div class="flex flex-col justify-center overflow-hidden flex-1">
-      <div v-if="loading" class="flex flex-col gap-1.5">
-        <div class="h-4 w-36 rounded bg-accented animate-pulse" />
-        <div class="h-3 w-20 rounded bg-accented/60 animate-pulse" />
-      </div>
-      <template v-else>
-        <h1 class="text-[0.9375rem] font-bold text-highlighted m-0 truncate">{{ roomName }}</h1>
-        <p class="text-xs text-dimmed m-0">Public channel</p>
-      </template>
+      <h1 class="text-[0.9375rem] font-bold text-highlighted m-0 truncate">{{ roomName || '...' }}</h1>
+      <p class="text-xs text-dimmed m-0">Public channel</p>
     </div>
 
     <!-- Actions -->

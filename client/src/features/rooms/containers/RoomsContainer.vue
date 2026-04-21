@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch, unref } from "vue";
 import { useRoute } from "vue-router";
 
 import MangoLayout from "@layouts/MangoLayout.vue";
@@ -7,7 +7,15 @@ import RoomsNavbar from "../components/RoomsNavbar.vue";
 import RoomsSidebar from "../components/RoomsSidebar.vue";
 import MembersSidebar from "../components/MembersSidebar.vue";
 import RoomHeader from "../components/RoomHeader.vue";
-import { useGetRoomDetails } from "../services/useGetRoomDetails";
+import MessageList from "../components/MessageList.vue";
+import MessageInput from "../components/MessageInput.vue";
+
+import { useGetMyRooms } from "../services/useGetMyRooms";
+import { useGetMessages } from "../services/useGetMessages";
+import { useMessagesWebSocket } from "../services/useMessagesWebSocket";
+import { useGetProfile } from "@features/identity/services/useGetProfile";
+
+import type { Message } from "../schemas/message.schema";
 
 const route = useRoute();
 
@@ -16,7 +24,83 @@ const roomId = computed(() => {
   return id ? Number(id) : null;
 });
 
-const { data: room, isPending: loadingRoom } = useGetRoomDetails(roomId);
+const { data: rooms } = useGetMyRooms();
+const { data: profile } = useGetProfile();
+const { data: messagesData, isPending: loadingMessages } = useGetMessages(roomId);
+
+// Find current room from the list
+const currentRoom = computed(() => {
+  if (!roomId.value || !rooms.value) return null;
+  return rooms.value.find((r) => r.id === roomId.value);
+});
+
+// Local messages state
+const messages = ref<Message[]>([]);
+const isSending = ref(false);
+
+// WebSocket connection
+const wsInstance = ref<ReturnType<typeof useMessagesWebSocket> | null>(null);
+
+// Computed for easier access
+const isWsConnected = computed(() => {
+  if (!wsInstance.value) return false;
+  return unref(wsInstance.value.isConnected);
+});
+
+// Initialize WebSocket when roomId changes
+watch(roomId, (newRoomId, oldRoomId) => {
+  if (oldRoomId && wsInstance.value) {
+    wsInstance.value.disconnect();
+    wsInstance.value = null;
+  }
+
+  if (newRoomId) {
+    wsInstance.value = useMessagesWebSocket({
+      roomId: newRoomId,
+      onMessage: (message) => {
+        // Add new message to the list if not already present
+        if (!messages.value.find((m) => m.id === message.id)) {
+          messages.value.push(message);
+        }
+        isSending.value = false;
+      },
+      onConnected: () => {
+        console.log("WebSocket connected");
+      },
+      onDisconnected: () => {
+        console.log("WebSocket disconnected");
+      },
+      onError: (error) => {
+        console.error("WebSocket error:", error);
+        isSending.value = false;
+      },
+    });
+
+    if (wsInstance.value) {
+      wsInstance.value.connect();
+    }
+  } else {
+    messages.value = [];
+  }
+}, { immediate: true });
+
+// Update messages when data is loaded
+watch(messagesData, (newMessages) => {
+  if (newMessages) {
+    messages.value = [...newMessages];
+  }
+}, { immediate: true });
+
+// Handle sending messages
+const handleSendMessage = (content: string) => {
+  if (!wsInstance.value || !isWsConnected.value) {
+    console.error("WebSocket not connected");
+    return;
+  }
+
+  isSending.value = true;
+  wsInstance.value.sendMessage(content);
+};
 </script>
 
 <template>
@@ -35,23 +119,22 @@ const { data: room, isPending: loadingRoom } = useGetRoomDetails(roomId);
     <template #default>
       <template v-if="roomId">
         <!-- Room header -->
-        <RoomHeader :room-id="roomId" :room-name="room?.name" :loading="loadingRoom" />
+        <RoomHeader :room-id="roomId" :room-name="currentRoom?.name" />
 
-        <!-- Messages area (coming soon) -->
-        <div class="flex-1 overflow-y-auto flex items-center justify-center">
-          <div class="flex flex-col items-center gap-5 p-8 text-center max-w-sm">
-            <div class="size-16 rounded-2xl flex items-center justify-center shadow-sm"
-              style="background: linear-gradient(135deg, oklch(0.70 0.187 46 / 0.12), oklch(0.65 0.180 21 / 0.08))">
-              <UIcon name="i-lucide-message-square-dashed" class="text-3xl text-primary/50" />
-            </div>
-            <div class="space-y-2">
-              <h3 class="text-base font-bold text-highlighted m-0">Messages coming soon</h3>
-              <p class="text-sm text-muted leading-relaxed m-0">
-                The messaging engine is on its way.<br />Hang tight — conversations are almost here.
-              </p>
-            </div>
-          </div>
-        </div>
+        <!-- Messages area -->
+        <MessageList
+          :messages="messages"
+          :current-user-id="profile?.id"
+          :loading="loadingMessages"
+        />
+
+        <!-- Message input -->
+        <MessageInput
+          :room-name="currentRoom?.name"
+          :disabled="!isWsConnected"
+          :sending="isSending"
+          @send="handleSendMessage"
+        />
       </template>
 
       <!-- No room selected -->
