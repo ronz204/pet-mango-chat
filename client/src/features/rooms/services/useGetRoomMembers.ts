@@ -8,7 +8,7 @@ export interface RoomMember {
   id: number;
   userId: number;
   userName: string;
-  role: MemberRole;
+  userRole: MemberRole;
 };
 
 interface GetMembersResponse {

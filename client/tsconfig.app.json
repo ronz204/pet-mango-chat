@@ -17,6 +17,7 @@
       "@features/*": ["./src/features/*"],
 
       "@guards/*": ["./src/shared/guards/*"],
+      "@hooks/*": ["./src/shared/hooks/*"],
       "@layouts/*": ["./src/shared/layouts/*"],
       "@stores/*": ["./src/shared/stores/*"],
       "@routes/*": ["./src/shared/routes/*"],

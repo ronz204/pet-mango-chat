@@ -10,6 +10,7 @@ export default defineConfig({
     "@assets": "/src/assets",
     "@features": "/src/features",
 
+    "@hooks": "/src/shared/hooks",
     "@layouts": "/src/shared/layouts",
     "@guards": "/src/shared/guards",
     "@stores": "/src/shared/stores",

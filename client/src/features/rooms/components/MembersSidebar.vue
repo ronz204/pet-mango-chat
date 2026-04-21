@@ -6,10 +6,10 @@ const props = defineProps<{
   roomId: number | null;
 }>();
 
-const { data: members, isPending, isError } = useGetRoomMembers(() => props.roomId);
+const { data: members, isPending, isError } = useGetRoomMembers(computed(() => props.roomId));
 
-const admins = computed(() => members.value?.filter((m) => m.role === "ADMIN") ?? []);
-const users = computed(() => members.value?.filter((m) => m.role === "USER") ?? []);
+const admins = computed(() => members.value?.filter((m) => m.userRole === "ADMIN") ?? []);
+const users = computed(() => members.value?.filter((m) => m.userRole === "USER") ?? []);
 
 function initials(name: string): string {
   return name
