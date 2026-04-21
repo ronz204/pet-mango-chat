@@ -1,8 +1,10 @@
 import { Elysia } from "elysia";
 import { CorsPlugin } from "@plugins/cors.plugin";
-import { RoomsPlugin } from "@features/rooms/plugin";
+import { ErrorsPlugin } from "@plugins/errors.plugin";
 import { HealthPlugin } from "@plugins/health.plugin";
 import { ScalarPlugin } from "@plugins/scalar.plugin";
+
+import { RoomsPlugin } from "@features/rooms/plugin";
 import { ProfilePlugin } from "@features/profile/plugin";
 import { IdentityPlugin } from "@features/identity/plugin";
 import { InvitationsPlugin } from "@features/invites/plugin";
@@ -11,6 +13,7 @@ const app = new Elysia({ prefix: "/api" })
   .use(CorsPlugin)
   .use(ScalarPlugin)
   .use(HealthPlugin)
+  .use(ErrorsPlugin)
   .use(IdentityPlugin)
   .use(ProfilePlugin)
   .use(RoomsPlugin)
