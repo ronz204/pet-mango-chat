@@ -1,4 +1,4 @@
-import type { IInvitationDao } from "./invitation.idao";
+import type { IInviteDao } from "./invite.idao";
 import { PrismaClient } from "@prisma/client";
 
 import { Create } from "./queries/create.query";
@@ -7,7 +7,7 @@ import { Obtain } from "./queries/obtain.query";
 import { Search } from "./queries/search.query";
 import { Invitees } from "./queries/invitees.query";
 
-export class InvitationDao implements IInvitationDao {
+export class InviteDao implements IInviteDao {
   constructor(private prisma: PrismaClient) {};
 
   public async invitees(args: Invitees.Args) {

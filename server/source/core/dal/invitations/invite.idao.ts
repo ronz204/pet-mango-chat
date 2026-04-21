@@ -7,7 +7,7 @@ import { Obtain } from "./queries/obtain.query";
 import { Search } from "./queries/search.query";
 import { Invitees } from "./queries/invitees.query";
 
-export interface IInvitationDao {
+export interface IInviteDao {
   create(args: Create.Args): Promise<Invitation>;
   update(args: Update.Args): Promise<Invitation>;
   invitees(args: Invitees.Args): Promise<User[]>;
