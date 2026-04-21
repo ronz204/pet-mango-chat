@@ -1,6 +1,6 @@
 import type { RoomFindManyArgs } from "@prisma/models";
 
-export namespace Own {
+export namespace GetOwn {
   export interface Args {
     userId: number;
   };
