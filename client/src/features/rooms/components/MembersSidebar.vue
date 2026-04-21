@@ -4,6 +4,7 @@ import { useGetRoomMembers } from "../services/useGetRoomMembers";
 
 const props = defineProps<{
   roomId: number | null;
+  onlineUserIds: Set<number>;
 }>();
 
 const { data: members, isPending, isError } = useGetRoomMembers(computed(() => props.roomId));
@@ -17,6 +18,10 @@ function initials(name: string): string {
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase() ?? "")
     .join("");
+}
+
+function isOnline(userId: number): boolean {
+  return props.onlineUserIds.has(userId);
 }
 </script>
 
@@ -73,10 +78,16 @@ function initials(name: string): string {
             v-for="member in admins"
             :key="member.id"
             class="flex items-center gap-2.5 px-1.5 py-2 rounded-lg hover:bg-accented/50 transition-colors duration-120 cursor-default">
-            <div
-              class="size-9 shrink-0 rounded-full flex items-center justify-center text-[0.72rem] font-bold text-white shadow-sm"
-              style="background: linear-gradient(135deg, oklch(0.70 0.187 46), oklch(0.65 0.180 21))">
-              {{ initials(member.userName) }}
+            <div class="relative shrink-0">
+              <div
+                class="size-9 rounded-full flex items-center justify-center text-[0.72rem] font-bold text-white shadow-sm"
+                style="background: linear-gradient(135deg, oklch(0.70 0.187 46), oklch(0.65 0.180 21))">
+                {{ initials(member.userName) }}
+              </div>
+              <div
+                class="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background shadow-sm"
+                :class="isOnline(member.userId) ? 'bg-[oklch(0.63_0.144_128)]' : 'bg-[oklch(0.48_0_0)]'"
+              />
             </div>
             <div class="flex flex-col overflow-hidden min-w-0">
               <span class="text-[0.8125rem] font-medium text-default truncate">{{ member.userName }}</span>
@@ -96,10 +107,16 @@ function initials(name: string): string {
             v-for="member in users"
             :key="member.id"
             class="flex items-center gap-2.5 px-1.5 py-2 rounded-lg hover:bg-accented/50 transition-colors duration-120 cursor-default">
-            <div
-              class="size-9 shrink-0 rounded-full flex items-center justify-center text-[0.72rem] font-bold"
-              style="background: linear-gradient(135deg, oklch(0.70 0.187 46 / 0.18), oklch(0.65 0.180 21 / 0.12)); color: oklch(0.65 0.180 21)">
-              {{ initials(member.userName) }}
+            <div class="relative shrink-0">
+              <div
+                class="size-9 rounded-full flex items-center justify-center text-[0.72rem] font-bold"
+                style="background: linear-gradient(135deg, oklch(0.70 0.187 46 / 0.18), oklch(0.65 0.180 21 / 0.12)); color: oklch(0.65 0.180 21)">
+                {{ initials(member.userName) }}
+              </div>
+              <div
+                class="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background shadow-sm"
+                :class="isOnline(member.userId) ? 'bg-[oklch(0.63_0.144_128)]' : 'bg-[oklch(0.48_0_0)]'"
+              />
             </div>
             <div class="flex flex-col overflow-hidden min-w-0">
               <span class="text-[0.8125rem] font-medium text-default truncate">{{ member.userName }}</span>

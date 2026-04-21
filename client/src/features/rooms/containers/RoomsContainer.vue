@@ -13,6 +13,7 @@ import MessageInput from "../components/MessageInput.vue";
 import { useGetMyRooms } from "../services/useGetMyRooms";
 import { useGetMessages } from "../services/useGetMessages";
 import { useMessagesWebSocket } from "../services/useMessagesWebSocket";
+import { usePresenceWebSocket } from "../services/usePresenceWebSocket";
 import { useGetProfile } from "@features/identity/services/useGetProfile";
 
 import type { Message } from "../schemas/message.schema";
@@ -38,8 +39,12 @@ const currentRoom = computed(() => {
 const messages = ref<Message[]>([]);
 const isSending = ref(false);
 
-// WebSocket connection
+// Online users state
+const onlineUserIds = ref<Set<number>>(new Set());
+
+// WebSocket connections
 const wsInstance = ref<ReturnType<typeof useMessagesWebSocket> | null>(null);
+const presenceWsInstance = ref<ReturnType<typeof usePresenceWebSocket> | null>(null);
 
 // Computed for easier access
 const isWsConnected = computed(() => {
@@ -49,12 +54,20 @@ const isWsConnected = computed(() => {
 
 // Initialize WebSocket when roomId changes
 watch(roomId, (newRoomId, oldRoomId) => {
-  if (oldRoomId && wsInstance.value) {
-    wsInstance.value.disconnect();
-    wsInstance.value = null;
+  // Cleanup previous connections
+  if (oldRoomId) {
+    if (wsInstance.value) {
+      wsInstance.value.disconnect();
+      wsInstance.value = null;
+    }
+    if (presenceWsInstance.value) {
+      presenceWsInstance.value.disconnect();
+      presenceWsInstance.value = null;
+    }
   }
 
   if (newRoomId) {
+    // Initialize messages WebSocket
     wsInstance.value = useMessagesWebSocket({
       roomId: newRoomId,
       onMessage: (message) => {
@@ -65,22 +78,51 @@ watch(roomId, (newRoomId, oldRoomId) => {
         isSending.value = false;
       },
       onConnected: () => {
-        console.log("WebSocket connected");
+        console.log("Messages WebSocket connected");
       },
       onDisconnected: () => {
-        console.log("WebSocket disconnected");
+        console.log("Messages WebSocket disconnected");
       },
       onError: (error) => {
-        console.error("WebSocket error:", error);
+        console.error("Messages WebSocket error:", error);
         isSending.value = false;
+      },
+    });
+
+    // Initialize presence WebSocket
+    presenceWsInstance.value = usePresenceWebSocket({
+      roomId: newRoomId,
+      onOnlineList: (userIds) => {
+        onlineUserIds.value = new Set(userIds);
+      },
+      onUserOnline: (userId) => {
+        onlineUserIds.value.add(userId);
+        onlineUserIds.value = new Set(onlineUserIds.value);
+      },
+      onUserOffline: (userId) => {
+        onlineUserIds.value.delete(userId);
+        onlineUserIds.value = new Set(onlineUserIds.value);
+      },
+      onConnected: () => {
+        console.log("Presence WebSocket connected");
+      },
+      onDisconnected: () => {
+        console.log("Presence WebSocket disconnected");
+      },
+      onError: (error) => {
+        console.error("Presence WebSocket error:", error);
       },
     });
 
     if (wsInstance.value) {
       wsInstance.value.connect();
     }
+    if (presenceWsInstance.value) {
+      presenceWsInstance.value.connect();
+    }
   } else {
     messages.value = [];
+    onlineUserIds.value = new Set();
   }
 }, { immediate: true });
 
@@ -163,7 +205,7 @@ const handleSendMessage = (content: string) => {
 
     <!-- Right sidebar: members -->
     <template #members>
-      <MembersSidebar :room-id="roomId" />
+      <MembersSidebar :room-id="roomId" :online-user-ids="onlineUserIds" />
     </template>
   </MangoLayout>
 </template>
