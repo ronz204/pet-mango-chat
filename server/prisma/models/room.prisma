@@ -7,7 +7,6 @@ model Room {
   invitations Invitation[]
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("rooms")
   @@schema("mango")
