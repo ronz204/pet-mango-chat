@@ -52,7 +52,7 @@ function formatDate(date: Date) {
 </script>
 
 <template>
-  <MangoLayout>
+  <MangoLayout :show-members="false">
     <!-- Navbar -->
     <template #navbar>
       <RoomsNavbar />
@@ -153,19 +153,6 @@ function formatDate(date: Date) {
             </ul>
           </div>
         </div>
-      </div>
-    </template>
-
-    <!-- Right sidebar: empty for invitations -->
-    <template #members>
-      <div class="flex flex-col items-center justify-center h-full px-6 text-center">
-        <div class="size-12 rounded-2xl flex items-center justify-center mb-3"
-          style="background: linear-gradient(135deg, oklch(0.70 0.187 46 / 0.12), oklch(0.65 0.180 21 / 0.08))">
-          <UIcon name="i-lucide-users" class="text-xl text-primary/40" />
-        </div>
-        <p class="text-xs text-dimmed m-0">
-          Accept an invitation to see room members
-        </p>
       </div>
     </template>
   </MangoLayout>

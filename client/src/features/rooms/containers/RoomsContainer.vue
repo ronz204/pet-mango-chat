@@ -57,7 +57,7 @@ watch(messagesData, (newMessages) => {
 </script>
 
 <template>
-  <MangoLayout>
+  <MangoLayout :show-members="!!roomId">
     <!-- Navbar -->
     <template #navbar>
       <RoomsNavbar />

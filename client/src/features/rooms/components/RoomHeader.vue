@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { useLeaveRoom } from "../services/useLeaveRoom";
+import InviteUsersModal from "./InviteUsersModal.vue";
 
 const props = defineProps<{
   roomId?: number | null;
@@ -8,6 +9,7 @@ const props = defineProps<{
 }>();
 
 const { mutate: leaveRoom, isPending: leaving } = useLeaveRoom();
+const showInviteModal = ref(false);
 
 const roomActions = computed(() => [
   [
@@ -39,10 +41,23 @@ const roomActions = computed(() => [
 
     <!-- Actions -->
     <div class="flex items-center gap-1 ml-auto shrink-0">
+      <UButton
+        v-if="roomId"
+        variant="soft"
+        color="primary"
+        icon="i-lucide-user-plus"
+        size="sm"
+        @click="showInviteModal = true">
+        Invite
+      </UButton>
+      
       <UDropdownMenu v-if="roomId" :items="roomActions" :ui="{ content: 'w-44' }">
         <UButton variant="ghost" color="neutral" icon="i-lucide-ellipsis" size="sm" :loading="leaving"
           aria-label="Room options" />
       </UDropdownMenu>
     </div>
+
+    <!-- Invite modal -->
+    <InviteUsersModal v-if="roomId" v-model:open="showInviteModal" :room-id="roomId" />
   </div>
 </template>

@@ -21,3 +21,23 @@ export interface DeclineInvitationResponse {
   success: boolean;
   invitationId: number;
 }
+
+export interface EligibleUser {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export interface GetEligibleInviteesResponse {
+  users: EligibleUser[];
+}
+
+export interface CreateInvitationBody {
+  roomId: number;
+  inviteeId: number;
+}
+
+export interface CreateInvitationResponse {
+  success: boolean;
+  invitationId: number;
+}
